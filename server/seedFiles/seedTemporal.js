@@ -97,21 +97,27 @@ const refreshTemporalData = async () => {
     ]);
     console.log("✓ Temporal activity collections cleared");
 
-    // ── 4. GENERATE 30 DAYS OF BILLS & INVENTORY SALES HISTORY ──────────
+    // ── 4. GENERATE 30 DAYS OF RICH BILLING & INVENTORY SALES HISTORY ──
     const bills = [];
     const historyRecords = [];
+    const historicalForecastPOs = [];
+    const defaultSupplier = suppliers[0] || { _id: new mongoose.Types.ObjectId() };
+
     for (let daysAgo = 29; daysAgo >= 0; daysAgo--) {
       const date = daysAgoDate(daysAgo);
       const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-      const billsThisDay = isWeekend ? rand(8, 15) : rand(3, 8);
+      // Generate rich daily volume: 15-32 bills on weekends, 10-22 on weekdays
+      const billsThisDay = isWeekend ? rand(15, 32) : rand(10, 22);
+      let dayTotalUnitsSold = 0;
 
       for (let b = 0; b < billsThisDay; b++) {
-        const numItems = rand(1, 4);
+        const numItems = rand(1, 5);
         const shuffled = [...medicines].sort(() => Math.random() - 0.5);
         const pickedMeds = shuffled.slice(0, numItems);
 
         const items = pickedMeds.map((m) => {
-          const quantity = rand(1, 6);
+          const quantity = rand(1, 8);
+          dayTotalUnitsSold += quantity;
           const price = m.sellingPrice;
           return {
             medicineId: m._id,
@@ -157,9 +163,31 @@ const refreshTemporalData = async () => {
           });
         });
       }
+
+      // Seed historical AI forecast prediction record for this day
+      const predictedDemandUnits = Math.round(dayTotalUnitsSold * (0.88 + (((daysAgo * 37 + 19) % 27) / 100)));
+      historicalForecastPOs.push({
+        order_number: `PO-HIST-${Date.now()}-${daysAgo}`,
+        medicine_id: medicines[0]._id,
+        medicine_name: medicines[0].name,
+        supplier_id: defaultSupplier._id,
+        requested_quantity: predictedDemandUnits,
+        unit_price: 15,
+        total_amount: predictedDemandUnits * 15,
+        order_status: "AI_Draft",
+        expected_delivery_date: new Date(date.getTime() + 7 * 86400000),
+        created_by: owner._id,
+        ai_forecast_reference: {
+          demand_predicted: predictedDemandUnits * 7,
+          forecast_date: date,
+          priority: "Medium",
+        },
+      });
     }
+
     await Bill.insertMany(bills, { ordered: false });
     await InventoryHistory.insertMany(historyRecords, { ordered: false });
+    await PurchaseOrder.insertMany(historicalForecastPOs, { ordered: false });
     console.log(
       `✓ Seeded ${bills.length} Bills & ${historyRecords.length} Sales History records across past 30 days`
     );
@@ -183,7 +211,7 @@ const refreshTemporalData = async () => {
 
     // ── 6. SEED ALERTS & PURCHASE ORDERS ───────────────────────────────
     const purchaseOrders = [];
-    const defaultSupplier = suppliers[0] || { _id: new mongoose.Types.ObjectId() };
+    const mainSupplier = suppliers[0] || { _id: new mongoose.Types.ObjectId() };
 
     for (let i = 0; i < Math.min(3, medicines.length); i++) {
       const med = medicines[i];
