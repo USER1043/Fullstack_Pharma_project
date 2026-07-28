@@ -106,8 +106,8 @@ export const classifyMedicineMovements = (series, currentStock, reorderLevel) =>
 
     let priority = 'medium';
     if (movement === 'fast_moving') priority = 'high';
-    if (currentStock <= reorderLevel / 2) priority = 'critical';
-    else if (currentStock <= reorderLevel) priority = 'high';
+    if (currentStock <= reorderLevel) priority = 'high';
+    if (movement === 'slow_moving' && currentStock > reorderLevel * 2) priority = 'low';
 
     return { movement, priority };
 };

@@ -89,7 +89,7 @@ const purchaseOrderSchema = new mongoose.Schema(
     },
     order_status: {
       type: String,
-      enum: ['AI_Draft', 'Pending', 'Approved', 'Ordered', 'Shipped', 'Received', 'Cancelled'],
+      enum: ['AI_Draft', 'Pending', 'Approved', 'Ordered', 'Shipped', 'Received', 'Cancelled', 'Adjusted'],
       default: 'Pending',
     },
     expected_delivery_date: {
@@ -113,7 +113,7 @@ const purchaseOrderSchema = new mongoose.Schema(
       forecast_date: Date,
       priority: {
         type: String,
-        enum: ['Low', 'Medium', 'High', 'Critical'],
+        enum: ['Low', 'Medium', 'High'],
         default: 'Medium'
       }
     },
