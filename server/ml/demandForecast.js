@@ -1,3 +1,7 @@
+/**
+ * @file Machine learning demand forecasting algorithm combining Holt-Winters & LSTM models.
+ * @module ml/demandForecast
+ */
 import { Bill } from '../models/billModel.js';
 import { InventoryHistory } from '../models/inventoryHistoryModel.js';
 import { lstmForecast } from './lstmModel.js';

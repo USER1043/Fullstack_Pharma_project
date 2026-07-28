@@ -1,10 +1,14 @@
+/**
+ * @file Controller for managing AI demand forecasting, recommendations, and parameters.
+ * @module controllers/forecastController
+ */
 import { Medicine } from '../models/medicineModel.js';
 import { AuditLog } from '../models/auditLogModel.js';
 import { InventoryHistory } from '../models/inventoryHistoryModel.js';
 import { ForecastParameters } from '../models/forecastModel.js';
 import { PurchaseOrder, Supplier } from '../models/supplierModels.js';
 import { computeForecast } from '../ml/demandForecast.js';
-// Hardcoded params (ForecastParameters schema deleted to remove singleton pattern)
+
 const DEFAULT_PARAMS = {
     forecastHorizon: 4,
     leadTimeDays: 7,
@@ -12,6 +16,7 @@ const DEFAULT_PARAMS = {
     seasonalMultipliers: { jan: 1.0, feb: 1.0, mar: 1.1, apr: 1.2, may: 1.2, jun: 1.1, jul: 1.3, aug: 1.3, sep: 1.2, oct: 1.4, nov: 1.4, dec: 1.2 }
 };
 
+// Generates AI demand forecasts and draft purchase orders for medicines.
 export const runForecast = async (req, res) => {
     try {
         const medicines = await Medicine.find();
@@ -22,14 +27,13 @@ export const runForecast = async (req, res) => {
             dbParams = dbParams.toObject();
         }
 
-        // Delete existing AI_Drafts so we don't pile them up
         await PurchaseOrder.deleteMany({ order_status: 'AI_Draft' });
 
         const drafts = [];
         for (const med of medicines) {
             const forecast = await computeForecast(med, dbParams);
 
-            if (forecast.optimalReorderQty > 0 || forecast.priority === 'critical') {
+            if (forecast.optimalReorderQty > 0 || forecast.priority === 'high') {
                 // Determine supplier
                 let supplier = await Supplier.findOne({ medicine_categories: med.category, is_active: true });
                 if (!supplier) supplier = await Supplier.findOne(); // fallback
