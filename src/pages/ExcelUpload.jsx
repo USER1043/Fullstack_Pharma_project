@@ -1,5 +1,8 @@
+/**
+ * @file Bulk Excel import and inventory export page component.
+ * @module pages/ExcelUpload
+ */
 import { useState, useEffect, useRef } from 'react';
-import Layout from '../components/Layout';
 import axiosInstance from '../utils/axiosConfig';
 import { FaFileExcel, FaUpload, FaDownload, FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaSpinner } from 'react-icons/fa';
 
@@ -114,7 +117,7 @@ const ExcelUpload = () => {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
-  const formatDate = (d) => d ? new Date(d).toLocaleString('en-IN') : '—';
+  const formatDate = (d) => d ? new Date(d).toLocaleString('en-IN') : '-';
 
   const statusBadge = (status) => {
     const map = {
@@ -126,8 +129,7 @@ const ExcelUpload = () => {
   };
 
   return (
-    <Layout>
-      <div>
+    <div>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <FaFileExcel className="text-green-600 text-3xl" />
@@ -316,7 +318,7 @@ const ExcelUpload = () => {
                     <td className="px-5 py-3 text-sm text-green-600 font-semibold">{log.recordsSuccessful}</td>
                     <td className="px-5 py-3 text-sm text-red-500 font-semibold">{log.recordsFailed}</td>
                     <td className="px-5 py-3">{statusBadge(log.status)}</td>
-                    <td className="px-5 py-3 text-sm text-gray-600">{log.uploadedBy?.username || '—'}</td>
+                    <td className="px-5 py-3 text-sm text-gray-600">{log.uploadedBy?.username || '-'}</td>
                     <td className="px-5 py-3 text-sm text-gray-500">{formatDate(log.createdAt)}</td>
                   </tr>
                 ))}
@@ -325,7 +327,6 @@ const ExcelUpload = () => {
           </div>
         )}
       </div>
-    </Layout>
   );
 };
 

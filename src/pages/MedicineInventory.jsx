@@ -1,10 +1,8 @@
 /**
- * @file Manages medicine inventory records, batches, pricing, and dynamic categories.
+ * @file Medicine inventory database page component for managing medicines and batches.
  * @module pages/MedicineInventory
  */
-
 import { useState, useEffect, useCallback } from 'react';
-import Layout from '../components/Layout';
 import dayjs from 'dayjs';
 import axiosInstance from '../utils/axiosConfig';
 
@@ -357,7 +355,6 @@ const MedicineInventory = () => {
 
     // ── render ─────────────────────────────────────────────
     return (
-        <Layout>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <Box sx={{ pb: 4 }}>
                     {/* ── Header ────────────────────────────────── */}
@@ -738,7 +735,6 @@ const MedicineInventory = () => {
                     </Alert>
                 </Snackbar>
             </LocalizationProvider>
-        </Layout>
     );
 };
 

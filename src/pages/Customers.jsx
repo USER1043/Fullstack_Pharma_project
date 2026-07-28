@@ -1,6 +1,9 @@
+/**
+ * @file Customer management page for viewing customer directory and adding new profiles.
+ * @module pages/Customers
+ */
 import { useState, useEffect, useCallback } from 'react';
 import axiosInstance from '../utils/axiosConfig';
-import Layout from '../components/Layout';
 import { FaSearch, FaTimes, FaPlus, FaUserPlus } from 'react-icons/fa';
 
 const Customers = () => {
@@ -98,7 +101,7 @@ const Customers = () => {
   };
 
   return (
-    <Layout>
+    <>
       <div>
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Customer Management</h1>
 
@@ -109,52 +112,47 @@ const Customers = () => {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              placeholder="Search by name, phone, or email..."
-              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              disabled={loading}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by customer name, phone, or email..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm"
             />
-            {searchQuery && (
-              <button
-                onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                disabled={loading}
-              >
-                <FaTimes />
-              </button>
-            )}
           </div>
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium text-sm"
           >
             <FaPlus /> Add Customer
           </button>
         </div>
 
+        {/* Customer Table */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Purchases</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {customers.length > 0 ? (
-                customers.map((customer) => (
-                  <tr key={customer.id || customer._id} className="hover:bg-gray-50">
+              {filteredCustomers.length > 0 ? (
+                filteredCustomers.map((customer) => (
+                  <tr key={customer._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 font-semibold text-gray-900">{customer.name}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${customer.customerType === 'regular' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
-                        }`}>
-                        {customer.customerType ? customer.customerType.charAt(0).toUpperCase() + customer.customerType.slice(1) : 'Unknown'}
+                    <td className="px-6 py-4 text-sm font-mono text-gray-600">{customer.phone}</td>
+                    <td className="px-6 py-4 text-sm">
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-semibold ${customer.customerType === 'regular'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-gray-100 text-gray-800'
+                          }`}
+                      >
+                        {customer.customerType}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm">{customer.phone}</td>
                     <td className="px-6 py-4 text-sm">{customer.email}</td>
                     <td className="px-6 py-4 text-sm font-semibold">{customer.totalPurchases || '-'}</td>
                   </tr>
@@ -192,25 +190,23 @@ const Customers = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  value={newCustomer.name}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder="John Doe"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
                 <input
-                  type="text"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
+                  type="tel"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                  placeholder="+919876543210"
+                  value={newCustomer.phone}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="9876543210"
                 />
               </div>
 
@@ -218,10 +214,9 @@ const Customers = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input
                   type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  value={newCustomer.email}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder="john@example.com"
                 />
               </div>
@@ -229,13 +224,12 @@ const Customers = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Customer Type</label>
                 <select
-                  name="customerType"
-                  value={formData.customerType}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  value={newCustomer.customerType}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, customerType: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="regular">Regular</option>
-                  <option value="walking">Walking</option>
+                  <option value="walk-in">Walk-in</option>
                 </select>
               </div>
 
@@ -243,10 +237,9 @@ const Customers = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                 <input
                   type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  value={newCustomer.address}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, address: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder="123 Main St"
                 />
               </div>
@@ -255,15 +248,14 @@ const Customers = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
                 <input
                   type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                  placeholder="Chennai"
+                  value={newCustomer.city}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, city: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Mumbai"
                 />
               </div>
 
-              <div className="flex gap-2 justify-end pt-4">
+              <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
@@ -283,7 +275,7 @@ const Customers = () => {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   );
 };
 

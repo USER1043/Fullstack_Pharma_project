@@ -1,4 +1,8 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+/**
+ * @file Provides persistent layout shell with sidebar navigation and outlet rendering.
+ * @module components/Layout
+ */
+import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   FaTachometerAlt, FaBoxes, FaFileInvoice, FaUsers, FaUsersCog,
@@ -9,6 +13,7 @@ import Chatbot from './Chatbot';
 import SecuritySettingsModal from './SecuritySettingsModal';
 import logo from '../assets/logo.png';
 
+// Renders persistent application layout shell with sidebar and child routes.
 const Layout = ({ children }) => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
@@ -16,6 +21,7 @@ const Layout = ({ children }) => {
   const [showChatbot, setShowChatbot] = useState(false);
   const [showSecurityModal, setShowSecurityModal] = useState(false);
 
+  // Handles user logout action and redirects to login.
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -127,7 +133,7 @@ const Layout = ({ children }) => {
 
       {/* Main Content */}
       <main className="ml-64 flex-1 p-8">
-        {children}
+        {children || <Outlet />}
       </main>
 
       {/* Chatbot Toggle Button */}

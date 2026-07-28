@@ -1,5 +1,8 @@
+/**
+ * @file System activity log page component displaying audit trails and filter options.
+ * @module pages/ActivityLog
+ */
 import { useState, useEffect, useCallback } from 'react';
-import Layout from '../components/Layout';
 import axiosInstance from '../utils/axiosConfig';
 import {
     FaShieldAlt,
@@ -182,36 +185,31 @@ export default function ActivityLog() {
     // ─────────────────────────────────────────────────────────────
     if (loading) {
         return (
-            <Layout>
-                <div className="flex items-center justify-center h-64">
-                    <div className="text-center">
-                        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                        <p className="text-gray-500 text-sm">Loading activity logs…</p>
-                    </div>
+            <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    <p className="text-gray-500 text-sm">Loading activity logs…</p>
                 </div>
-            </Layout>
+            </div>
         );
     }
 
     if (error) {
         return (
-            <Layout>
-                <div className="flex items-center justify-center h-64">
-                    <div className="text-center">
-                        <FaExclamationTriangle className="text-4xl text-red-400 mx-auto mb-3" />
-                        <p className="text-red-600 font-medium">{error}</p>
-                        <button onClick={handleRefresh} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition">
-                            Retry
-                        </button>
-                    </div>
+            <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                    <FaExclamationTriangle className="text-4xl text-red-400 mx-auto mb-3" />
+                    <p className="text-red-600 font-medium">{error}</p>
+                    <button onClick={handleRefresh} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition">
+                        Retry
+                    </button>
                 </div>
-            </Layout>
+            </div>
         );
     }
 
     return (
-        <Layout>
-            <div className="space-y-6">
+        <div className="space-y-6">
 
                 {/* ── Header ──────────────────────────────────────────── */}
                 <div className="flex items-center justify-between">
@@ -432,6 +430,5 @@ export default function ActivityLog() {
                     )}
                 </div>
             </div>
-        </Layout>
     );
 }

@@ -1,5 +1,8 @@
+/**
+ * @file Billing POS page component for creating bills, processing payments, and customer selection.
+ * @module pages/Billing
+ */
 import { useState, useEffect } from 'react';
-import Layout from '../components/Layout';
 import axiosInstance from '../utils/axiosConfig';
 import { formatCurrency, sortByFEFO } from '../utils/helpers';
 import { FaSearch, FaTrash, FaCheck, FaMicrophone, FaStop, FaPlus, FaEdit, FaTimesCircle } from 'react-icons/fa';
@@ -252,55 +255,52 @@ const Billing = () => {
   // Payment success screen
   if (showPaymentSuccess && currentBill) {
     return (
-      <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-          <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center">
-            <div className="mb-6">
-              <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                <FaCheck className="text-green-600 text-4xl" />
-              </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center">
+          <div className="mb-6">
+            <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+              <FaCheck className="text-green-600 text-4xl" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Payment Successful!</h2>
-            <p className="text-gray-600 mb-6">Transaction completed successfully</p>
-
-            <div className="bg-gray-50 p-6 rounded-xl mb-6">
-              <div className="flex justify-between mb-3">
-                <span className="text-gray-600">Bill ID:</span>
-                <span className="font-semibold">#{currentBill.id}</span>
-              </div>
-              <div className="flex justify-between mb-3">
-                <span className="text-gray-600">Amount Paid:</span>
-                <span className="font-bold text-2xl text-primary-600">{formatCurrency(currentBill.total)}</span>
-              </div>
-              <div className="flex justify-between mb-3">
-                <span className="text-gray-600">Payment Method:</span>
-                <span className="font-semibold uppercase">{currentBill.paymentMethod}</span>
-              </div>
-              <div className="flex justify-between mb-3">
-                <span className="text-gray-600">Date & Time:</span>
-                <span className="font-semibold">{new Date(currentBill.date).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Customer:</span>
-                <span className="font-semibold">
-                  {currentBill.customerName}
-                  {currentBill.customerType === 'regular' && (
-                    <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Regular</span>
-                  )}
-                </span>
-              </div>
-            </div>
-
-            <p className="text-sm text-gray-500">Redirecting to new bill...</p>
           </div>
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Payment Successful!</h2>
+          <p className="text-gray-600 mb-6">Transaction completed successfully</p>
+
+          <div className="bg-gray-50 p-6 rounded-xl mb-6">
+            <div className="flex justify-between mb-3">
+              <span className="text-gray-600">Bill ID:</span>
+              <span className="font-semibold">#{currentBill.id}</span>
+            </div>
+            <div className="flex justify-between mb-3">
+              <span className="text-gray-600">Amount Paid:</span>
+              <span className="font-bold text-2xl text-primary-600">{formatCurrency(currentBill.total)}</span>
+            </div>
+            <div className="flex justify-between mb-3">
+              <span className="text-gray-600">Payment Method:</span>
+              <span className="font-semibold uppercase">{currentBill.paymentMethod}</span>
+            </div>
+            <div className="flex justify-between mb-3">
+              <span className="text-gray-600">Date & Time:</span>
+              <span className="font-semibold">{new Date(currentBill.date).toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Customer:</span>
+              <span className="font-semibold">
+                {currentBill.customerName}
+                {currentBill.customerType === 'regular' && (
+                  <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Regular</span>
+                )}
+              </span>
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-500">Redirecting to new bill...</p>
         </div>
-      </Layout>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div>
+    <div>
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Billing</h1>
           <p className="text-gray-600 mt-2">Create new bills with FEFO batch preference</p>
@@ -711,7 +711,6 @@ const Billing = () => {
           </div>
         </div>
       </div>
-    </Layout>
   );
 };
 

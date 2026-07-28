@@ -1,5 +1,8 @@
+/**
+ * @file AI demand forecasting configuration setup page.
+ * @module pages/ai/DemandSetup
+ */
 import { useState, useEffect } from 'react';
-import Layout from '../../components/Layout';
 import axiosInstance from '../../utils/axiosConfig';
 import { FaBrain, FaSave, FaPlay, FaRegCalendarAlt } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
@@ -76,16 +79,13 @@ export default function DemandSetup() {
     };
 
     if (loading) return (
-        <Layout>
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            </div>
-        </Layout>
+        <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
     );
 
     return (
-        <Layout>
-            <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto">
                 <div className="flex items-center gap-3 mb-6">
                     <FaBrain className="text-3xl text-blue-600" />
                     <h1 className="text-2xl font-bold text-gray-800">Demand Parameter Setup</h1>
@@ -207,6 +207,5 @@ export default function DemandSetup() {
                     </div>
                 </div>
             </div>
-        </Layout>
     );
 }

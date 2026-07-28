@@ -28,6 +28,14 @@ const daysAgoDate = (daysAgo, hour) => {
   d.setHours(hour ?? rand(8, 21), rand(0, 59), rand(0, 59), 0);
   return d;
 };
+
+// Generates a date object representing a specific number of days in the future.
+const daysFutureDate = (daysAhead) => {
+  const d = new Date();
+  d.setDate(d.getDate() + daysAhead);
+  d.setHours(12, 0, 0, 0);
+  return d;
+};
 let billSeq = 1000;
 const nextBill = () => `BILL-SEED-${billSeq++}`;
 const SAMPLE_IPS = [
@@ -234,7 +242,7 @@ const seedDatabase = async () => {
         batches: [
           {
             batchNumber: "ASP-001",
-            expiryDate: new Date("2025-12-31"),
+            expiryDate: daysFutureDate(180),
             quantity: 500,
             rackNumber: "A1",
           },
@@ -252,7 +260,7 @@ const seedDatabase = async () => {
         batches: [
           {
             batchNumber: "AMX-001",
-            expiryDate: new Date("2026-06-30"),
+            expiryDate: daysFutureDate(20),
             quantity: 45,
             rackNumber: "B2",
           },
@@ -270,7 +278,7 @@ const seedDatabase = async () => {
         batches: [
           {
             batchNumber: "PAR-001",
-            expiryDate: new Date("2025-08-15"),
+            expiryDate: daysAgoDate(15),
             quantity: 200,
             rackNumber: "A2",
           },
@@ -288,7 +296,7 @@ const seedDatabase = async () => {
         batches: [
           {
             batchNumber: "OMP-001",
-            expiryDate: new Date("2026-02-10"),
+            expiryDate: daysFutureDate(90),
             quantity: 80,
             rackNumber: "C1",
           },
@@ -306,7 +314,7 @@ const seedDatabase = async () => {
         batches: [
           {
             batchNumber: "CS-001",
-            expiryDate: new Date("2025-05-20"),
+            expiryDate: daysAgoDate(45),
             quantity: 120,
             rackNumber: "D1",
           },
@@ -324,7 +332,7 @@ const seedDatabase = async () => {
         batches: [
           {
             batchNumber: "IBU-001",
-            expiryDate: new Date("2026-11-30"),
+            expiryDate: daysFutureDate(14),
             quantity: 30,
             rackNumber: "A3",
           },
@@ -342,7 +350,7 @@ const seedDatabase = async () => {
         batches: [
           {
             batchNumber: "VIT-001",
-            expiryDate: new Date("2027-01-31"),
+            expiryDate: daysFutureDate(365),
             quantity: 300,
             rackNumber: "E1",
           },
@@ -360,7 +368,7 @@ const seedDatabase = async () => {
         batches: [
           {
             batchNumber: "AC-001",
-            expiryDate: new Date("2026-03-25"),
+            expiryDate: daysFutureDate(45),
             quantity: 40,
             rackNumber: "F1",
           },
@@ -378,7 +386,7 @@ const seedDatabase = async () => {
         batches: [
           {
             batchNumber: "CET-001",
-            expiryDate: new Date("2026-08-15"),
+            expiryDate: daysFutureDate(150),
             quantity: 150,
             rackNumber: "B1",
           },
@@ -396,7 +404,7 @@ const seedDatabase = async () => {
         batches: [
           {
             batchNumber: "MET-001",
-            expiryDate: new Date("2027-04-10"),
+            expiryDate: daysFutureDate(400),
             quantity: 500,
             rackNumber: "C2",
           },
@@ -414,7 +422,7 @@ const seedDatabase = async () => {
         batches: [
           {
             batchNumber: "AML-001",
-            expiryDate: new Date("2026-10-05"),
+            expiryDate: daysFutureDate(240),
             quantity: 250,
             rackNumber: "D2",
           },
@@ -432,7 +440,7 @@ const seedDatabase = async () => {
         batches: [
           {
             batchNumber: "AZI-001",
-            expiryDate: new Date("2025-11-20"),
+            expiryDate: daysFutureDate(60),
             quantity: 60,
             rackNumber: "E2",
           },

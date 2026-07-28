@@ -1,5 +1,8 @@
+/**
+ * @file Reorder review page component for automated reorder suggestions and purchase order creation.
+ * @module pages/reorder/ReorderReview
+ */
 import { useState, useEffect } from 'react';
-import Layout from '../../components/Layout';
 import axiosInstance from '../../utils/axiosConfig';
 import { FaExclamationTriangle, FaCheckCircle, FaTimesCircle, FaStar, FaShoppingCart } from 'react-icons/fa';
 
@@ -131,11 +134,10 @@ const ReorderReview = () => {
     }
   };
 
-  if (loading) return <Layout><div className="p-6">Loading...</div></Layout>;
+  if (loading) return <div className="p-6">Loading...</div>;
 
   return (
-    <Layout>
-      <div className="p-6">
+    <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">Reorder Management</h1>
@@ -449,7 +451,6 @@ const ReorderReview = () => {
           </div>
         )}
       </div>
-    </Layout>
   );
 };
 

@@ -4,7 +4,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import Layout from '../../components/Layout';
 import axiosInstance from '../../utils/axiosConfig';
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaStar } from 'react-icons/fa';
 
@@ -119,11 +118,10 @@ const SupplierManagement = () => {
     supplier?.supplier_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <Layout><div className="p-6">Loading...</div></Layout>;
+  if (loading) return <div className="p-6">Loading...</div>;
 
   return (
-    <Layout>
-      <div className="p-6">
+    <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">Supplier Management</h1>
@@ -349,7 +347,6 @@ const SupplierManagement = () => {
           </div>
         )}
       </div>
-    </Layout>
   );
 };
 

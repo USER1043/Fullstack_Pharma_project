@@ -1,5 +1,8 @@
+/**
+ * @file User management page component for managing user accounts and roles.
+ * @module pages/admin/UserManagement
+ */
 import { useState, useEffect } from 'react';
-import Layout from '../../components/Layout';
 import axiosInstance from '../../utils/axiosConfig';
 import { FaPlus, FaEdit, FaTrash, FaUser, FaShieldAlt, FaUserTie, FaKey, FaToggleOn, FaToggleOff } from 'react-icons/fa';
 
@@ -124,11 +127,10 @@ const UserManagement = () => {
     return role === 'owner' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800';
   };
 
-  if (loading) return <Layout><div className="p-6">Loading...</div></Layout>;
+  if (loading) return <div className="p-6">Loading...</div>;
 
   return (
-    <Layout>
-      <div className="p-6">
+    <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">User & Role Management</h1>
@@ -342,7 +344,6 @@ const UserManagement = () => {
           </div>
         </div>
       </div>
-    </Layout>
   );
 };
 
