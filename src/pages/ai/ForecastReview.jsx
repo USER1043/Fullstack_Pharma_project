@@ -12,21 +12,17 @@ import {
   FaEdit,
   FaTrash,
   FaPlus,
-  FaFilter,
   FaSync,
-  FaExclamationTriangle,
 } from "react-icons/fa";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
   ResponsiveContainer,
   BarChart,
   Bar,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
 } from "recharts";
 import {
   Box,
@@ -55,6 +51,7 @@ import {
 } from "@mui/material";
 import { toast } from "react-hot-toast";
 
+// Renders AI Forecast and Reorder recommendations review panel.
 export default function ForecastReview() {
   const [recommendations, setRecommendations] = useState([]);
   const [trendData, setTrendData] = useState([]);
@@ -76,29 +73,29 @@ export default function ForecastReview() {
   });
   const [medicines, setMedicines] = useState([]);
 
+  // Fetches forecast recommendations and trend comparison data from backend.
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [recRes, trendRes] = await Promise.all([
-        axiosInstance.get("/forecast/recommendations", {
-          params: { search, ...filters },
-        }),
+        axiosInstance.get("/forecast/recommendations"),
         axiosInstance.get("/forecast/trend"),
       ]);
-      setRecommendations(recRes.data.recommendations);
-      setTrendData(trendRes.data.trend);
+      setRecommendations(recRes.data?.recommendations || []);
+      setTrendData(trendRes.data?.trend || []);
     } catch (error) {
       toast.error("Failed to fetch forecast data");
     } finally {
       setLoading(false);
     }
-  }, [search, filters]);
+  }, []);
 
   useEffect(() => {
     fetchData();
     fetchMedicines();
   }, [fetchData]);
 
+  // Fetches medicine catalog for manual reorder selection.
   const fetchMedicines = async () => {
     try {
       const { data } = await axiosInstance.get("/inventory");
@@ -108,6 +105,7 @@ export default function ForecastReview() {
     }
   };
 
+  // Updates approval status for a recommendation.
   const handleStatusUpdate = async (id, status, approvedQty) => {
     try {
       await axiosInstance.put(`/forecast/recommendations/${id}`, {
@@ -121,6 +119,7 @@ export default function ForecastReview() {
     }
   };
 
+  // Deletes an AI draft recommendation.
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this recommendation?"))
       return;
@@ -133,6 +132,7 @@ export default function ForecastReview() {
     }
   };
 
+  // Submits manual recommendation create or edit dialog.
   const handleModalSubmit = async () => {
     try {
       if (modalType === "add") {
@@ -145,9 +145,12 @@ export default function ForecastReview() {
       } else {
         await axiosInstance.put(
           `/forecast/recommendations/${formData._id}`,
-          formData,
+          {
+            ...formData,
+            status: "adjusted",
+          },
         );
-        toast.success("Recommendation updated");
+        toast.success("Recommendation adjusted");
       }
       setIsModalOpen(false);
       fetchData();
@@ -156,17 +159,20 @@ export default function ForecastReview() {
     }
   };
 
+  // Opens modal pre-populated for editing recommendation.
   const openEditModal = (rec) => {
     setModalType("edit");
     setFormData({
       ...rec,
+      priority: (rec.priority || "medium").toLowerCase(),
       restockingDate: dayjs(rec.restockingDate).format("YYYY-MM-DD"),
     });
     setIsModalOpen(true);
   };
 
+  // Maps priority level to MUI Chip color palette.
   const getPriorityColor = (p) => {
-    switch (p) {
+    switch (p?.toLowerCase()) {
       case "critical":
         return "error";
       case "high":
@@ -178,8 +184,27 @@ export default function ForecastReview() {
     }
   };
 
+  // Filter recommendations based on search term, priority, and status
+  const filteredRecommendations = recommendations.filter((rec) => {
+    const matchesSearch =
+      !search ||
+      rec.medicineName?.toLowerCase().includes(search.toLowerCase()) ||
+      rec.category?.toLowerCase().includes(search.toLowerCase());
+
+    const matchesPriority =
+      !filters.priority ||
+      rec.priority?.toLowerCase() === filters.priority.toLowerCase();
+
+    const matchesStatus =
+      !filters.status ||
+      rec.status?.toLowerCase() === filters.status.toLowerCase();
+
+    return matchesSearch && matchesPriority && matchesStatus;
+  });
+
   return (
     <Box sx={{ mb: 4 }}>
+      {/* Header */}
       <Box
         sx={{
           display: "flex",
@@ -209,14 +234,15 @@ export default function ForecastReview() {
               setIsModalOpen(true);
             }}
           >
-            Add Manual
+            Add Manual Override
           </Button>
           <Button
             variant="contained"
             startIcon={<FaSync />}
             onClick={fetchData}
+            sx={{ backgroundColor: "#6366f1", "&:hover": { backgroundColor: "#4f46e5" } }}
           >
-            Refresh
+            Refresh Data
           </Button>
         </Box>
       </Box>
@@ -226,88 +252,85 @@ export default function ForecastReview() {
         <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
           Predicted vs Actual Demand (Last 14 Days)
         </Typography>
-        <Box sx={{ height: 300 }}>
+        <Box sx={{ height: 280 }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={trendData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke="#f0f0f0"
-              />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
               <XAxis dataKey="date" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
               <Tooltip />
               <Legend />
-              <Bar
-                dataKey="predicted"
-                name="Predicted Units"
-                fill="#a78bfa"
-                radius={[4, 4, 0, 0]}
-              />
-              <Bar
-                dataKey="actual"
-                name="Actual Units"
-                fill="#34d399"
-                radius={[4, 4, 0, 0]}
-              />
+              <Bar dataKey="predicted" name="Predicted Units" fill="#a78bfa" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="actual" name="Actual Units" fill="#34d399" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Box>
       </Paper>
 
-      {/* Filters and Search */}
-      <FormControl
-        sx={{
-          p: 2,
-          mb: 3,
-          borderRadius: 3,
-          display: "flex",
-          gap: 2,
-          flexWrap: "wrap",
-          alignItems: "center",
-        }}
-      >
-        <TextField
-          size="small"
-          placeholder="Search medicine..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <FaSearch style={{ marginRight: 8, color: "#94a3b8" }} />
-            ),
+      {/* Recommendations & Horizontal Filters Container */}
+      <Paper sx={{ p: 3, borderRadius: 3 }}>
+        {/* Horizontal Filters Bar */}
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            mb: 3,
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
-          sx={{ flexGrow: 1 }}
-        />
-        <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Priority</InputLabel>
-          <Select
-            value={filters.priority}
-            label="Priority"
-            onChange={(e) =>
-              setFilters({ ...filters, priority: e.target.value })
-            }
-          >
-            <option value="">All Priorities</option>
-            <MenuItem value="critical">Critical</MenuItem>
-            <MenuItem value="high">High</MenuItem>
-            <MenuItem value="medium">Medium</MenuItem>
-            <MenuItem value="low">Low</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Status</InputLabel>
-          <Select
-            value={filters.status}
-            label="Status"
-            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          >
-            <MenuItem value="pending">Pending</MenuItem>
-            <MenuItem value="approved">Approved</MenuItem>
-            <MenuItem value="adjusted">Adjusted</MenuItem>
-            <MenuItem value="rejected">Rejected</MenuItem>
-          </Select>
-        </FormControl>
+        >
+          <Box sx={{ display: "flex", gap: 2, flex: 1, minWidth: 280, flexWrap: "wrap" }}>
+            <TextField
+              size="small"
+              placeholder="Search medicine name or category..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(0);
+              }}
+              InputProps={{
+                startAdornment: <FaSearch style={{ marginRight: 8, color: "#94a3b8" }} />,
+              }}
+              sx={{ minWidth: 240, flex: 1 }}
+            />
+            <FormControl size="small" sx={{ minWidth: 160 }}>
+              <InputLabel>Priority</InputLabel>
+              <Select
+                value={filters.priority}
+                label="Priority"
+                onChange={(e) => {
+                  setFilters({ ...filters, priority: e.target.value });
+                  setPage(0);
+                }}
+              >
+                <MenuItem value="">All Priorities</MenuItem>
+                <MenuItem value="high">High</MenuItem>
+                <MenuItem value="medium">Medium</MenuItem>
+                <MenuItem value="low">Low</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 160 }}>
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={filters.status}
+                label="Status"
+                onChange={(e) => {
+                  setFilters({ ...filters, status: e.target.value });
+                  setPage(0);
+                }}
+              >
+                <MenuItem value="">All Statuses</MenuItem>
+                <MenuItem value="pending">Pending</MenuItem>
+                <MenuItem value="approved">Approved</MenuItem>
+                <MenuItem value="adjusted">Adjusted</MenuItem>
+                <MenuItem value="rejected">Rejected</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </Box>
+
+        {/* Recommendations Table */}
         <TableContainer>
           <Table>
             <TableHead sx={{ backgroundColor: "#f8fafc" }}>
@@ -330,94 +353,121 @@ export default function ForecastReview() {
                     Loading forecast review data...
                   </TableCell>
                 </TableRow>
-              ) : recommendations.length === 0 ? (
+              ) : filteredRecommendations.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
                     No recommendations matching your filters.
                   </TableCell>
                 </TableRow>
               ) : (
-                recommendations
+                filteredRecommendations
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <TableRow key={row._id} hover>
-                      <TableCell sx={{ fontWeight: 600 }}>
-                        {row.medicineName || "Manual Item"}
-                      </TableCell>
-                      <TableCell>{row.currentStock || 0}</TableCell>
-                      <TableCell sx={{ fontWeight: 700, color: "#6366f1" }}>
-                        {row.optimalReorderQty}
-                      </TableCell>
-                      <TableCell>
-                        ₹
-                        {((row.optimalReorderQty || 0) * 0).toLocaleString(
-                          "en-IN",
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={row.priority.toUpperCase()}
-                          color={getPriorityColor(row.priority)}
-                          size="small"
-                          sx={{ fontWeight: 700, fontSize: 10 }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={row.status.toUpperCase()}
-                          variant="outlined"
-                          color={
-                            row.status === "approved"
-                              ? "success"
-                              : row.status === "rejected"
-                                ? "error"
-                                : "warning"
-                          }
-                          size="small"
-                          sx={{ fontWeight: 700, fontSize: 10 }}
-                        />
-                      </TableCell>
-                      <TableCell align="right">
-                        {row.status === "pending" && (
-                          <>
-                            <IconButton
-                              color="success"
-                              onClick={() =>
-                                handleStatusUpdate(
-                                  row._id,
-                                  "approved",
-                                  row.optimalReorderQty,
-                                )
-                              }
-                            >
-                              <FaCheck />
-                            </IconButton>
-                            <IconButton
-                              color="primary"
-                              onClick={() => openEditModal(row)}
-                            >
-                              <FaEdit />
-                            </IconButton>
-                            <IconButton
-                              color="error"
-                              onClick={() =>
-                                handleStatusUpdate(row._id, "rejected")
-                              }
-                            >
-                              <FaTrash />
-                            </IconButton>
-                          </>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  .map((row) => {
+                    const price = row.medicineId?.purchasePrice || row.purchasePrice || 15;
+                    const estCost = (row.optimalReorderQty || 0) * price;
+
+                    return (
+                      <TableRow key={row._id} hover>
+                        <TableCell sx={{ fontWeight: 600 }}>
+                          {row.medicineName || row.medicineId?.name || "Manual Item"}
+                          <Typography variant="caption" color="text.secondary" display="block">
+                            {row.category || row.medicineId?.category || "General"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.currentStock ?? row.medicineId?.quantity ?? 0}</TableCell>
+                        <TableCell sx={{ fontWeight: 700, color: "#6366f1" }}>
+                          {row.optimalReorderQty}
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 600 }}>
+                          ₹{estCost.toLocaleString("en-IN")}
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={(row.priority || "medium").toUpperCase()}
+                            color={getPriorityColor(row.priority)}
+                            size="small"
+                            sx={{ fontWeight: 700, fontSize: 10 }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={(row.status || "pending").toUpperCase()}
+                            variant="outlined"
+                            color={
+                              row.status === "approved"
+                                ? "success"
+                                : row.status === "rejected"
+                                  ? "error"
+                                  : row.status === "adjusted"
+                                    ? "secondary"
+                                    : "warning"
+                            }
+                            size="small"
+                            sx={{ fontWeight: 700, fontSize: 10 }}
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          {row.status === "pending" || row.status === "adjusted" ? (
+                            <>
+                              <IconButton
+                                color="success"
+                                onClick={() =>
+                                  handleStatusUpdate(
+                                    row._id,
+                                    "approved",
+                                    row.optimalReorderQty,
+                                  )
+                                }
+                                title="Approve Recommendation"
+                              >
+                                <FaCheck />
+                              </IconButton>
+                              <IconButton
+                                color="primary"
+                                onClick={() => openEditModal(row)}
+                                title="Edit / Adjust Quantity & Priority"
+                              >
+                                <FaEdit />
+                              </IconButton>
+                              <IconButton
+                                color="error"
+                                onClick={() =>
+                                  handleStatusUpdate(row._id, "rejected")
+                                }
+                                title="Reject Recommendation"
+                              >
+                                <FaTrash />
+                              </IconButton>
+                            </>
+                          ) : (
+                            <>
+                              <IconButton
+                                color="primary"
+                                onClick={() => openEditModal(row)}
+                                title="Edit / Re-adjust"
+                              >
+                                <FaEdit />
+                              </IconButton>
+                              <IconButton
+                                color="error"
+                                onClick={() => handleDelete(row._id)}
+                                title="Delete Recommendation"
+                              >
+                                <FaTrash />
+                              </IconButton>
+                            </>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
               )}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
           component="div"
-          count={recommendations.length}
+          count={filteredRecommendations.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={(e, newPage) => setPage(newPage)}
@@ -426,15 +476,10 @@ export default function ForecastReview() {
             setPage(0);
           }}
         />
-      </FormControl>
+      </Paper>
 
       {/* Manual Entry / Edit Modal */}
-      <Dialog
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        fullWidth
-        maxWidth="sm"
-      >
+      <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle sx={{ fontWeight: 700 }}>
           {modalType === "add"
             ? "Add Manual Recommendation"
@@ -471,7 +516,7 @@ export default function ForecastReview() {
                 onChange={(e) =>
                   setFormData((f) => ({
                     ...f,
-                    optimalReorderQty: parseInt(e.target.value),
+                    optimalReorderQty: parseInt(e.target.value, 10) || 0,
                   }))
                 }
               />
@@ -480,7 +525,7 @@ export default function ForecastReview() {
               <FormControl fullWidth>
                 <InputLabel>Priority</InputLabel>
                 <Select
-                  value={formData.priority}
+                  value={(formData.priority || "medium").toLowerCase()}
                   label="Priority"
                   onChange={(e) =>
                     setFormData((f) => ({ ...f, priority: e.target.value }))
@@ -489,7 +534,6 @@ export default function ForecastReview() {
                   <MenuItem value="low">Low</MenuItem>
                   <MenuItem value="medium">Medium</MenuItem>
                   <MenuItem value="high">High</MenuItem>
-                  <MenuItem value="critical">Critical</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -517,3 +561,4 @@ export default function ForecastReview() {
     </Box>
   );
 }
+
