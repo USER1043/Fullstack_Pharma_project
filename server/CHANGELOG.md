@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.2.0](https://github.com/USER1043/MediStock_AI/compare/backend-v1.1.0...backend-v1.2.0) (2026-07-28)
+
+
+### Features
+
+* **forecast:** update recommendation status handling and continuous trend data in forecastController ([2bd7894](https://github.com/USER1043/MediStock_AI/commit/2bd789489c2c4b137711598600b36125008a75b0))
+* **schema:** update PurchaseOrder status enum to include Adjusted and standardize priority levels ([4640236](https://github.com/USER1043/MediStock_AI/commit/4640236b40a461e1bb16691107382681042ec652))
+* **seeder:** add seedTemporal script to refresh time-sensitive analytics without wiping core entities ([7d24e25](https://github.com/USER1043/MediStock_AI/commit/7d24e25f39c83f5bf59085701c6968af4649c18e))
+
 ## [1.1.0](https://github.com/USER1043/Fullstack_Pharma_project/compare/backend-v1.0.0...backend-v1.1.0) (2026-06-01)
 
 

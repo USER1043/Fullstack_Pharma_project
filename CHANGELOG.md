@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.2.0](https://github.com/USER1043/MediStock_AI/compare/frontend-v1.1.0...frontend-v1.2.0) (2026-07-28)
+
+
+### Features
+
+* **forecast:** update recommendation status handling and continuous trend data in forecastController ([2bd7894](https://github.com/USER1043/MediStock_AI/commit/2bd789489c2c4b137711598600b36125008a75b0))
+* **reports:** connect FinancialReports page to live backend sales and purchase APIs ([2f7d151](https://github.com/USER1043/MediStock_AI/commit/2f7d1514ad9d7b0622bc60c20b7e5c5efcf5564c))
+* **schema:** update PurchaseOrder status enum to include Adjusted and standardize priority levels ([4640236](https://github.com/USER1043/MediStock_AI/commit/4640236b40a461e1bb16691107382681042ec652))
+* **seeder:** add seedTemporal script to refresh time-sensitive analytics without wiping core entities ([7d24e25](https://github.com/USER1043/MediStock_AI/commit/7d24e25f39c83f5bf59085701c6968af4649c18e))
+
+
+### Bug Fixes
+
+* **deployment:** add vercel.json and _redirects SPA rewrite configuration pointing to index.html ([ecf1792](https://github.com/USER1043/MediStock_AI/commit/ecf1792d4f2179756027b76979bd49bd7fd896b3))
+* **forecast:** fix ForecastReview layout alignment, status actions, priority select, and cost calculation ([47835e6](https://github.com/USER1043/MediStock_AI/commit/47835e65acf85116ec4c97a75b7833967cb7b65b))
+* **inventory:** display EXPIRED status badge in expiry column for expired stock ([24362ef](https://github.com/USER1043/MediStock_AI/commit/24362efae3aad9409390db716052dbcfa07f077e))
+
 ## [1.1.0](https://github.com/USER1043/Fullstack_Pharma_project/compare/frontend-v1.0.0...frontend-v1.1.0) (2026-06-01)
 
 
